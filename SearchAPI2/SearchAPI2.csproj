@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  <ItemGroup>
+    <Compile Include="..\SearchAPI\Logic\Database.cs">
+      <Link>Logic\Database.cs</Link>
+    </Compile>
+    <Compile Include="..\SearchAPI\Logic\SearchFactory.cs">
+      <Link>Logic\SearchFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\SearchAPI\Logic\SearchLogic.cs">
+      <Link>Logic\SearchLogic.cs</Link>
+    </Compile>
+    <Compile Include="..\SearchAPI\Controllers\SearchController.cs">
+      <Link>Controllers\SearchController.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Core.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
+  </ItemGroup>
+</Project>

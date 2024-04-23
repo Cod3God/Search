@@ -1,0 +1,60 @@
+﻿@using Core;
+@page "/search"
+<h1>Search</h1>
+
+<InputText @bind-Value="query"></InputText>
+<button @onclick="OnClickSearch">Search</button>
+
+@if (result != null)
+{
+    <p>Hits:  @result.Hits <br /></p>
+
+    <p>Time used:  @result.TimeUsed.ToString()</p>
+    <table class="table">
+        <tbody>
+            @foreach (var dh in result.DocumentHits)
+            {
+                <tr>
+                    <td>
+                        <a class="link-info" href="" @onclick="() => OnClickDocUrl(dh.Document.mUrl)" @onclick:preventDefault>
+                            @dh.Document.mUrl</a>
+                        (# hits: @dh.NoOfHits)
+                     </td>
+
+                </tr>
+                   }
+        </tbody>
+    </table>
+    <ModalDialog @ref="@modalDialog" Title="Indhold">
+        <div class="row">
+            <h3>@fileUrl</h3>
+            <hr>
+            <p>@fileContent</p>
+            <button class="btn btn-primary" @onclick="() => modalDialog.Close()">Close</button>
+        </div>
+    </ModalDialog>}
+@code {
+    private string fileUrl = "";
+    private string fileContent = "";
+
+    private string query = "";
+
+    private ISearchLogic mLogic = SearchFactory.GetProxy();
+
+    private SearchResult? result;
+
+    private void OnClickSearch()
+    {
+        result = mLogic.Search(query.Split(" "), 10);
+    }
+
+    private void OnClickDocUrl(string url) {
+        var s = File.ReadAllText(url);
+        fileUrl = url;
+        fileContent = s;
+        modalDialog.Open();
+    }
+
+    private ModalDialog? modalDialog { get; set; }
+}
+
