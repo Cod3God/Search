@@ -7,6 +7,5 @@ namespace Core
 
         public static string DATABASE = @"/Users/jonat/Desktop/ItArkitekturPrincipper/TestData/searchDBSmall.db";
 
-       //Test
     }
 }
