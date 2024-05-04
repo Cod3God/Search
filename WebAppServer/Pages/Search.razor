@@ -12,6 +12,7 @@
     <p>Time used:  @result.TimeUsed.ToString()</p>
     <table class="table">
         <tbody>
+            @*
             @foreach (var dh in result.DocumentHits)
             {
                 <tr>
@@ -23,6 +24,22 @@
 
                 </tr>
                    }
+        *@
+                   @* Test med ny kode her!!!*@
+            @foreach (var dh in result.DocumentHits)
+            {
+                <tr>
+                    <td>
+                        <a class="link-info" href="" @onclick="() => OnClickDocUrl(dh.Document.mUrl)" @onclick:preventDefault>
+                            @dh.Document.mUrl
+                        </a>
+                        (# hits: @dh.NoOfHits)
+                        @dh.Context <!-- Displaying the context -->
+                    </td>
+                </tr>
+            }
+                   @*SLUT!*@
+                   
         </tbody>
     </table>
     <ModalDialog @ref="@modalDialog" Title="Indhold">
@@ -45,7 +62,8 @@
 
     private void OnClickSearch()
     {
-        result = mLogic.Search(query.Split(" "), 10);
+        int contextLength = 5; // Set your desired context length here
+        result = mLogic.Search(query.Split(" "), 10, contextLength);
     }
 
     private void OnClickDocUrl(string url) {
