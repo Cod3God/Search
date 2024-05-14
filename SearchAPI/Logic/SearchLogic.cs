@@ -19,7 +19,10 @@ namespace SearchAPI.Logic
         /* Perform search of documents containing words from query. The result will
          * contain details about amost maxAmount of documents.
          */
-        public SearchResult Search(String[] query, int maxAmount)
+
+        //Ny
+        public SearchResult Search(string[] query, int maxAmount, int contextLength)
+        //public SearchResult Search(String[] query, int maxAmount)
         {
             List<string> ignored;
 

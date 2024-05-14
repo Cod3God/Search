@@ -17,6 +17,9 @@ namespace SearchAPI.Controllers
             mConfig = _config;
         }
 
+
+        //Gammel
+        /*
         [HttpGet]
         [Route("{query}/{maxAmount}")]
         public SearchResult Search(string query, int maxAmount)
@@ -24,6 +27,15 @@ namespace SearchAPI.Controllers
             var logic = SearchAPI.Logic.SearchFactory.GetSearchLogic();
             return logic.Search(query.Split(","), maxAmount);
             
+        }
+        */
+        //Ny
+        [HttpGet]
+        [Route("{query}/{maxAmount}/{contextLength}")] // Add contextLength parameter to the route
+        public SearchResult Search(string query, int maxAmount, int contextLength) // Add contextLength parameter
+        {
+            var logic = SearchAPI.Logic.SearchFactory.GetSearchLogic();
+            return logic.Search(query.Split(","), maxAmount, contextLength); // Pass contextLength to the Search method
         }
 
         [HttpGet]
