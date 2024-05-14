@@ -163,6 +163,34 @@ public class SearchProxy : ISearchLogic
         return context;
     }
 
+    //Alternative GetContext
+    /*
+    public string GetContext(string text, string searchWord, int contextLength)
+{
+    // Split the text into words
+    string[] words = text.Split(" ");
+
+    // Find the index of the search word
+    int index = Array.IndexOf(words, searchWord);
+
+    // If the search word is not found, return empty string
+    if (index == -1)
+        return "";
+
+    // Calculate the start and end index for the context
+    int startIndex = Math.Max(index - contextLength, 0);
+    int endIndex = Math.Min(index + contextLength, words.Length - 1);
+
+    // Extract the context words
+    string[] contextWords = words[startIndex..(endIndex + 1)];
+
+    // Join the context words into a string
+    string context = string.Join(" ", contextWords);
+
+    return context;
+}
+    */
+
     private string RetrieveTextFromUrl(string url)
     {
         // Your logic to make an HTTP request to retrieve the text content from the document URL
