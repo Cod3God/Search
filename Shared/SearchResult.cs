@@ -23,5 +23,7 @@ namespace Core
         public List<string> Ignored { get; set; }
 
         public TimeSpan TimeUsed { get; set; }
+
+        //public string Results { get; set; }
     }
 }
