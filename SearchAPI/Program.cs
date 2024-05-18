@@ -1,38 +1,42 @@
-﻿namespace SearchAPI;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Core;
+using SearchAPI.Logic;
 
-public class Program
+namespace SearchAPI
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container.
-
-        builder.Services.AddControllers();
-
-        builder.Services.AddCors(options =>
+        public static void Main(string[] args)
         {
-            options.AddPolicy("policy",
-                              policy =>
-                              {
-                                  policy.AllowAnyOrigin();
-                              });
-        });
+            Console.WriteLine("Starting Search API...");
+            var builder = WebApplication.CreateBuilder(args);
 
-        var app = builder.Build();
+            // Add services to the container.
+            builder.Services.AddControllers();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("policy",
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin();
+                                  });
+            });
 
-        // Configure the HTTP request pipeline.
+            // Register the SearchLogic implementation
+            builder.Services.AddSingleton<ISearchLogic, SearchLogic>();
 
-        app.UseHttpsRedirection();
+            var app = builder.Build();
 
-        app.UseCors("policy");
+            // Configure the HTTP request pipeline.
+            app.UseHttpsRedirection();
+            app.UseCors("policy");
+            app.UseAuthorization();
+            app.MapControllers();
 
-        app.UseAuthorization();
-
-
-        app.MapControllers();
-
-        app.Run();
+            Console.WriteLine("Search API is running.");
+            app.Run();
+        }
     }
 }
-

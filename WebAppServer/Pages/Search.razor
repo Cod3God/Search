@@ -1,4 +1,5 @@
 ﻿@using Core;
+<!--
 @page "/search"
 <h1>Search</h1>
 
@@ -57,4 +58,43 @@
 
     private ModalDialog? modalDialog { get; set; }
 }
+-->
+@page "/search"
+@inject ISearchLogic SearchProxy
 
+<h3>Search</h3>
+
+<input @bind="searchTerm" placeholder="Enter search term" />
+<button @onclick="PerformSearch">Search</button>
+
+@if (searchResult != null)
+{
+    <div>
+        <h4>Search Results</h4>
+        <p>Hits: @searchResult.Result.Hits</p>
+        <ul>
+            @foreach (var hit in searchResult.Result.DocumentHits)
+            {
+                <li>@hit</li>
+            }
+        </ul>
+
+        <h4>Snippets</h4>
+        <ul>
+            @foreach (var snippet in searchResult.Snippets)
+            {
+                <li>@snippet</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    private string searchTerm;
+    private SearchResultWithSnippet searchResult;
+
+    private async Task PerformSearch()
+    {
+        searchResult = await SearchProxy.SearchAsync(new string[] { searchTerm }, 10);
+    }
+}

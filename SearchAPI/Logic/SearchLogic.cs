@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Core;
 using Core.Model;
 
@@ -16,10 +17,37 @@ namespace SearchAPI.Logic
             mDatabase = database;
         }
 
-        /* Perform search of documents containing words from query. The result will
-         * contain details about amost maxAmount of documents.
-         */
-        public SearchResult Search(String[] query, int maxAmount)
+        public SearchResultWithSnippet Search(string[] query, int maxAmount)
+        {
+            // Perform the search
+            var searchResult = PerformSearch(query, maxAmount);
+
+            // Snippets can be fetched from the snippet microservice
+            var snippets = FetchSnippets(query);
+
+            return new SearchResultWithSnippet
+            {
+                Result = searchResult,
+                Snippets = snippets
+            };
+        }
+
+        public async Task<SearchResultWithSnippet> SearchAsync(string[] query, int maxAmount)
+        {
+            // Perform the search
+            var searchResult = PerformSearch(query, maxAmount);
+
+            // Fetch snippets asynchronously from the snippet microservice
+            var snippets = await FetchSnippetsAsync(query);
+
+            return new SearchResultWithSnippet
+            {
+                Result = searchResult,
+                Snippets = snippets
+            };
+        }
+
+        private SearchResult PerformSearch(string[] query, int maxAmount)
         {
             List<string> ignored;
 
@@ -28,16 +56,16 @@ namespace SearchAPI.Logic
             // Convert words to wordids
             var wordIds = mDatabase.GetWordIds(query, out ignored);
 
-            // perform the search - get all docIds
+            // Perform the search - get all docIds
             var docIds = mDatabase.GetDocuments(wordIds);
 
-            // get ids for the first maxAmount             
+            // Get ids for the first maxAmount             
             var top = new List<int>();
             foreach (var p in docIds.GetRange(0, Math.Min(maxAmount, docIds.Count)))
                 top.Add(p.Key);
 
-            // compose the result.
-            // all the documentHit
+            // Compose the result
+            // All the documentHit
             List<DocumentHit> docresult = new List<DocumentHit>();
             int idx = 0;
             foreach (var doc in mDatabase.GetDocDetails(top))
@@ -60,6 +88,24 @@ namespace SearchAPI.Logic
                 Ignored = ignored,
                 TimeUsed = DateTime.Now - start
             };
+        }
+
+        private List<string> FetchSnippets(string[] query)
+        {
+            // Make synchronous call to snippet microservice
+            var httpClient = new HttpClient();
+            var response = httpClient.GetFromJsonAsync<List<SnippetResult>>($"http://localhost:5000/api/snippets/{string.Join(",", query)}").Result;
+
+            return response.Select(s => s.Snippet).ToList();
+        }
+
+        private async Task<List<string>> FetchSnippetsAsync(string[] query)
+        {
+            // Make asynchronous call to snippet microservice
+            var httpClient = new HttpClient();
+            var response = await httpClient.GetFromJsonAsync<List<SnippetResult>>($"http://localhost:5000/api/snippets/{string.Join(",", query)}");
+
+            return response.Select(s => s.Snippet).ToList();
         }
     }
 }
