@@ -12,18 +12,22 @@ namespace SearchAPI.Controllers
     public class SearchController : ControllerBase
     {
         private IConfiguration mConfig;
-        public SearchController(IConfiguration _config)
+        private readonly ISearchLogic _searchLogic;
+
+        public SearchController(IConfiguration config, ISearchLogic searchLogic)
         {
-            mConfig = _config;
+            mConfig = config;
+            _searchLogic = searchLogic;
         }
 
         [HttpGet]
         [Route("{query}/{maxAmount}")]
-        public SearchResult Search(string query, int maxAmount)
+        public async Task<SearchResultWithSnippet> Search(string query, int maxAmount)
         {
-            var logic = SearchAPI.Logic.SearchFactory.GetSearchLogic();
-            return logic.Search(query.Split(","), maxAmount);
-            
+            Console.WriteLine($"Received search request for query: {query} with maxAmount: {maxAmount}");
+            var searchResult = await _searchLogic.SearchAsync(query.Split(","), maxAmount);
+            Console.WriteLine("Search request processed successfully.");
+            return searchResult;
         }
 
         [HttpGet]
@@ -31,10 +35,6 @@ namespace SearchAPI.Controllers
         public string? Ping()
         {
             return mConfig.GetValue<string>("Id");
-
         }
-
-
     }
 }
-

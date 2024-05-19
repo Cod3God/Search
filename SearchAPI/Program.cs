@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Core;
 using SearchAPI.Logic;
 
+/*
 namespace SearchAPI
 {
     public class Program
@@ -17,11 +18,7 @@ namespace SearchAPI
             builder.Services.AddControllers();
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("policy",
-                                  policy =>
-                                  {
-                                      policy.AllowAnyOrigin();
-                                  });
+                options.AddPolicy("policy", policy => policy.AllowAnyOrigin());
             });
 
             // Register the SearchLogic implementation
@@ -38,5 +35,72 @@ namespace SearchAPI
             Console.WriteLine("Search API is running.");
             app.Run();
         }
+    }
+}
+*/
+
+/*
+namespace SearchAPI;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+
+        builder.Services.AddControllers();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthorization();
+
+
+        app.MapControllers();
+
+        app.Run();
+    }
+}
+*/
+namespace SearchAPI;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+
+        builder.Services.AddControllers();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("policy",
+                              policy =>
+                              {
+                                  policy.AllowAnyOrigin();
+                              });
+        });
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+
+        app.UseHttpsRedirection();
+
+        app.UseCors("policy");
+
+        app.UseAuthorization();
+
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

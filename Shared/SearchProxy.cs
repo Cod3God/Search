@@ -177,11 +177,15 @@ public class SnippetResult
 
 
 
+
+
 public class SearchProxy : ISearchLogic
 {
     private string DefaultserverEndPoint = "http://localhost:5036/api/search/";
     private string AlternativeserverEndPoint = "http://localhost:5086/api/search/";
     private string SnippetServiceEndPoint = "http://localhost:5000/api/snippets/";
+
+
 
     private HttpClient mHttp;
     private DateTime lastSearchTime;
@@ -267,6 +271,7 @@ public class SearchProxy : ISearchLogic
         return lastUsedEndpoint;
     }
 }
+
 
 
 
