@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Core;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using WebAppServer.Data;
 
@@ -14,6 +15,7 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<WeatherForecastService>();
+        builder.Services.AddSingleton<ISearchLogic, SearchProxy>();
 
         var app = builder.Build();
 
