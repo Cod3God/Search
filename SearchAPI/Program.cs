@@ -67,6 +67,8 @@ public class Program
     }
 }
 */
+
+/*
 namespace SearchAPI;
 
 public class Program
@@ -104,3 +106,47 @@ public class Program
         app.Run();
     }
 }
+*/
+
+
+//Testbranch
+namespace SearchAPI
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+            // Register services
+            builder.Services.AddSingleton<ISearchLogic, SearchProxy>();
+
+            // Add controllers
+            builder.Services.AddControllers();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
+        }
+    }
+}
+
+
+

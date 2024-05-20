@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Core;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 /*
@@ -28,6 +29,9 @@ namespace Core
 
 //Med asynkron metode
 
+
+//Fra gammel!
+/*
 namespace Core
 {
     public interface ISearchLogic
@@ -35,5 +39,17 @@ namespace Core
         SearchResultWithSnippet Search(string[] query, int maxAmount);
         Task<SearchResultWithSnippet> SearchAsync(string[] query, int maxAmount);
     }
+}
+*/
+
+namespace Core
+{
+    public interface ISearchLogic
+    {
+        SearchResultWithSnippet Search(string[] query, int maxAmount);
+    }
+
+
+
 }
 

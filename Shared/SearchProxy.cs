@@ -6,11 +6,8 @@ using System.Text.Json;
 using Core;
 using Microsoft.Data.Sqlite;
 using Shared;
-//using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
-
-
 using static System.Net.WebRequestMethods;
 
 
@@ -100,12 +97,8 @@ public class SearchProxy : ISearchLogic
 
 }
 */
-//Nyt
 
-
-
-
-//Gammel Test!
+// new-TestBranch
 /*
 public class SearchProxy : ISearchLogic
 {
@@ -122,80 +115,6 @@ public class SearchProxy : ISearchLogic
         mHttp = new HttpClient();
         lastSearchTime = DateTime.MinValue;
         lastUsedEndpoint = DefaultserverEndPoint;
-    }
-
-    public SearchResultWithSnippets Search(string[] query, int maxAmount)
-    {
-        string currentEndpoint = GetCurrentEndpoint();
-
-        Console.WriteLine($"Using API endpoint: {currentEndpoint}");
-
-        var task = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{String.Join(",", query)}/{maxAmount}");
-        var searchResult = task.Result;
-
-        lastSearchTime = DateTime.UtcNow;
-
-        var snippetsTask = mHttp.GetFromJsonAsync<List<SnippetResult>>($"{SnippetServiceEndPoint}{String.Join(",", query)}");
-        var snippets = snippetsTask.Result;
-
-        return new SearchResultWithSnippets
-        {
-            Results = searchResult.Results,
-            Snippets = snippets.Select(s => s.Snippet).ToList()
-        };
-    }
-
-    private string GetCurrentEndpoint()
-    {
-        TimeSpan timeSinceLastSearch = DateTime.UtcNow - lastSearchTime;
-
-        if (timeSinceLastSearch.TotalSeconds < 10)
-        {
-            lastUsedEndpoint = (lastUsedEndpoint == DefaultserverEndPoint) ? AlternativeserverEndPoint : DefaultserverEndPoint;
-            return lastUsedEndpoint;
-        }
-
-        lastUsedEndpoint = DefaultserverEndPoint;
-        return lastUsedEndpoint;
-    }
-}
-
-public class SearchResultWithSnippets
-{
-    public List<string> Results { get; set; }
-    public List<string> Snippets { get; set; }
-}
-
-public class SnippetResult
-{
-    public string Snippet { get; set; }
-}
-*/
-
-
-
-
-
-
-
-
-public class SearchProxy : ISearchLogic
-{
-    private string DefaultserverEndPoint = "http://localhost:5036/api/search/";
-    private string AlternativeserverEndPoint = "http://localhost:5086/api/search/";
-    private string SnippetServiceEndPoint = "http://localhost:5000/api/snippets/";
-
-
-
-    private HttpClient mHttp;
-    private DateTime lastSearchTime;
-    private string lastUsedEndpoint;
-
-    public SearchProxy()
-    {
-        mHttp = new HttpClient();
-        lastSearchTime = DateTime.MinValue; // Initialize to a default value
-        lastUsedEndpoint = DefaultserverEndPoint; // Initialize to default endpoint
         Console.WriteLine("SearchProxy initialized.");
     }
 
@@ -231,13 +150,14 @@ public class SearchProxy : ISearchLogic
     {
         string currentEndpoint = GetCurrentEndpoint();
         Console.WriteLine($"Using API endpoint: {currentEndpoint}");
-        var task = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{string.Join(",", query)}/{maxAmount}");
+        var task = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}?query={string.Join(",", query)}&maxAmount={maxAmount}");
         var res = task.Result;
 
         lastSearchTime = DateTime.UtcNow;
         Console.WriteLine("Search result received from API.");
         return res;
     }
+
 
     private List<string> FetchSnippets(string[] query)
     {
@@ -272,51 +192,80 @@ public class SearchProxy : ISearchLogic
     }
 }
 
-
-
-
-/*
-//Synkront!
-public SearchResultWithSnippet Search(string[] query, int maxAmount)
-{
-string currentEndpoint = GetCurrentEndpoint();
-
-var searchTask = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{string.Join(",", query)}/{maxAmount}");
-var searchResult = searchTask.Result; // Blocking call
-
-lastSearchTime = DateTime.UtcNow;
-
-var snippetsTask = mHttp.GetFromJsonAsync<List<SnippetResult>>($"{SnippetServiceEndPoint}{string.Join(",", query)}");
-var snippets = snippetsTask.Result; // Blocking call
-
-return new SearchResultWithSnippet
-{
-    Result = searchResult,
-    Snippets = snippets.Select(s => s.Snippet).ToList()
-};
-}
 */
-
-/*
-//Asynkront!
-public async Task<SearchResultWithSnippet> SearchAsync(string[] query, int maxAmount)
+public class SearchProxy : ISearchLogic
 {
-string currentEndpoint = GetCurrentEndpoint();
+    private string DefaultServerEndPoint = "http://localhost:5036/api/search/";
+    private string AlternativeServerEndPoint = "http://localhost:5086/api/search/";
+    private string SnippetServiceEndPoint = "http://localhost:5000/api/snippets/";
+    private HttpClient mHttp;
+    private DateTime lastSearchTime;
+    private string lastUsedEndpoint;
 
-var searchResult = await mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{string.Join(",", query)}/{maxAmount}");
+    public SearchProxy()
+    {
+        mHttp = new HttpClient();
+        lastSearchTime = DateTime.MinValue; // Initialize to a default value
+        lastUsedEndpoint = DefaultServerEndPoint; // Initialize to default endpoint
+        Console.WriteLine("SearchProxy initialized.");
+    }
 
-lastSearchTime = DateTime.UtcNow;
+    public SearchResultWithSnippet Search(string[] query, int maxAmount)
+    {
+        Console.WriteLine($"Starting synchronous search via proxy with query: {string.Join(", ", query)} and maxAmount: {maxAmount}");
+        var searchResult = PerformSearch(query, maxAmount);
+        var snippets = FetchSnippets(query);
 
-var snippets = await mHttp.GetFromJsonAsync<List<SnippetResult>>($"{SnippetServiceEndPoint}{string.Join(",", query)}");
+        Console.WriteLine("Synchronous proxy search completed.");
+        return new SearchResultWithSnippet
+        {
+            Result = searchResult,
+            Snippets = snippets
+        };
+    }
 
-return new SearchResultWithSnippet
-{
-    Result = searchResult,
-    Snippets = snippets.Select(s => s.Snippet).ToList()
-};
+    private SearchResult PerformSearch(string[] query, int maxAmount)
+    {
+        string currentEndpoint = GetCurrentEndpoint();
+        Console.WriteLine($"Using API endpoint: {currentEndpoint}");
+        var task = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{string.Join(",", query)}/{maxAmount}");
+        var res = task.Result;
+
+        lastSearchTime = DateTime.UtcNow;
+        Console.WriteLine("Search result received from API.");
+        return res;
+    }
+
+    private List<string> FetchSnippets(string[] query)
+    {
+        Console.WriteLine("Fetching snippets synchronously via SnippetService...");
+        var task = mHttp.GetFromJsonAsync<List<SnippetResult>>($"{SnippetServiceEndPoint}{query[0]}");
+        var snippets = task.Result;
+
+        Console.WriteLine($"Received {snippets.Count} snippets from SnippetService.");
+        return snippets.Select(s => s.Snippet).ToList();
+    }
+
+    private string GetCurrentEndpoint()
+    {
+        TimeSpan timeSinceLastSearch = DateTime.UtcNow - lastSearchTime;
+        if (timeSinceLastSearch.TotalSeconds < 10)
+        {
+            lastUsedEndpoint = (lastUsedEndpoint == DefaultServerEndPoint) ? AlternativeServerEndPoint : DefaultServerEndPoint;
+            return lastUsedEndpoint;
+        }
+
+        lastUsedEndpoint = DefaultServerEndPoint;
+        return lastUsedEndpoint;
+    }
 }
 
-*/
+
+
+
+
+
+
 
 
 
