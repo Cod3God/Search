@@ -7,5 +7,9 @@ namespace Core
 
         public static string DATABASE = @"/Users/jonat/Desktop/ItArkitekturPrincipper/TestData/searchDBSmall.db";
 
+
+        //public static string FOLDER = @"/Users/Jonathan/OneDrive/Skrivebord/DataBaseItArkitekturPrincipper/small";
+
+        //public static string DATABASE = @"/Users/Jonathan/OneDrive/Skrivebord/DataBaseItArkitekturPrincipper/SearchDBSmall.db";
     }
 }
