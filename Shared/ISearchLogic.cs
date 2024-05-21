@@ -48,8 +48,5 @@ namespace Core
     {
         SearchResultWithSnippet Search(string[] query, int maxAmount);
     }
-
-
-
 }
 

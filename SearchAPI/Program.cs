@@ -118,11 +118,9 @@ namespace SearchAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Register services
-            builder.Services.AddSingleton<ISearchLogic, SearchProxy>();
-
-            // Add controllers
+            // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.AddSingleton<ISearchLogic, SearchProxy>();
 
             var app = builder.Build();
 
@@ -144,6 +142,7 @@ namespace SearchAPI
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }

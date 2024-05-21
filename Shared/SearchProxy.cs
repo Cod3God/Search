@@ -195,6 +195,7 @@ public class SearchProxy : ISearchLogic
 }
 
 */
+
 public class SearchProxy : ISearchLogic
 {
     private string DefaultServerEndPoint = "http://localhost:5036/api/search/";
@@ -207,8 +208,8 @@ public class SearchProxy : ISearchLogic
     public SearchProxy()
     {
         mHttp = new HttpClient();
-        lastSearchTime = DateTime.MinValue; // Initialize to a default value
-        lastUsedEndpoint = DefaultServerEndPoint; // Initialize to default endpoint
+        lastSearchTime = DateTime.MinValue;
+        lastUsedEndpoint = DefaultServerEndPoint;
         Console.WriteLine("SearchProxy initialized.");
     }
     /*
@@ -313,6 +314,14 @@ public class SearchProxy : ISearchLogic
 
 
 
+<<<<<<< Updated upstream
+=======
+
+
+
+
+
+>>>>>>> Stashed changes
 public class SnippetResult
 {
     public string Snippet { get; set; }
