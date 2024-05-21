@@ -9,6 +9,8 @@ using Shared;
 using System.Linq;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
+using System.Net;
+using Core.Model;
 
 
 
@@ -209,7 +211,7 @@ public class SearchProxy : ISearchLogic
         lastUsedEndpoint = DefaultServerEndPoint; // Initialize to default endpoint
         Console.WriteLine("SearchProxy initialized.");
     }
-
+    /*
     public SearchResultWithSnippet Search(string[] query, int maxAmount)
     {
         Console.WriteLine($"Starting synchronous search via proxy with query: {string.Join(", ", query)} and maxAmount: {maxAmount}");
@@ -235,6 +237,51 @@ public class SearchProxy : ISearchLogic
         Console.WriteLine("Search result received from API.");
         return res;
     }
+    */
+    public SearchResultWithSnippet Search(string[] query, int maxAmount)
+    {
+        try
+        {
+            string currentEndpoint = GetCurrentEndpoint();
+            string url = $"{currentEndpoint}/api/search?query={string.Join(",", query)}&maxAmount={maxAmount}";
+            using (HttpClient client = new HttpClient())
+            {
+                var response = client.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    return response.Content.ReadFromJsonAsync<SearchResultWithSnippet>().Result;
+                }
+                else if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new SearchResultWithSnippet
+                    {
+                        Result = new SearchResult { Hits = 0, DocumentHits = new List<DocumentHit>() },
+                        Snippets = new List<string> { "Word doesn't exist, try again." }
+                    };
+                }
+                else
+                {
+                    throw new HttpRequestException($"Response status code does not indicate success: {response.StatusCode}.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            throw;
+        }
+    }
+
+
+
+
+    private SearchResult PerformSearch(string[] query, int maxAmount)
+    {
+        string currentEndpoint = GetCurrentEndpoint();
+        var response = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{string.Join(",", query)}/{maxAmount}").Result;
+
+        return response;
+    }
 
     private List<string> FetchSnippets(string[] query)
     {
@@ -259,9 +306,6 @@ public class SearchProxy : ISearchLogic
         return lastUsedEndpoint;
     }
 }
-
-
-
 
 
 

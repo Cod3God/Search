@@ -5,67 +5,37 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Core;
 
-/*
-namespace SearchAPI.Controllers
+
+[ApiController]
+[Route("api/search")]
+public class SearchController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class SearchController : ControllerBase
+    private readonly ISearchLogic _searchLogic;
+
+    public SearchController(ISearchLogic searchLogic)
     {
-        private readonly ISearchLogic _searchLogic;
+        _searchLogic = searchLogic;
+    }
 
-        public SearchController(ISearchLogic searchLogic)
+    [HttpGet]
+    public IActionResult Get([FromQuery] string[] query, [FromQuery] int maxAmount)
+    {
+        try
         {
-            _searchLogic = searchLogic;
+            var result = _searchLogic.Search(query, maxAmount);
+            return Ok(result);
         }
-
-        [HttpGet]
-        public IActionResult Get([FromQuery] string[] query, [FromQuery] int maxAmount)
+        catch (Exception ex)
         {
-            try
-            {
-                var result = _searchLogic.Search(query, maxAmount);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+            Console.WriteLine($"Error: {ex.Message}");
+            return StatusCode(500, "Internal server error");
         }
     }
 }
-*/
 
 
-//Endpoints issue?
-namespace SearchAPI.Controllers
-{
-    [ApiController]
-    [Route("api/search")] // Explicitly set the route to "api/search"
-    public class SearchController : ControllerBase
-    {
-        private readonly ISearchLogic _searchLogic;
 
-        public SearchController(ISearchLogic searchLogic)
-        {
-            _searchLogic = searchLogic;
-        }
 
-        [HttpGet]
-        public IActionResult Get([FromQuery] string[] query, [FromQuery] int maxAmount)
-        {
-            try
-            {
-                var result = _searchLogic.Search(query, maxAmount);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-    }
-}
+
+
 
