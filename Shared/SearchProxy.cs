@@ -311,17 +311,6 @@ public class SearchProxy : ISearchLogic
 
 
 
-
-
-
-<<<<<<< Updated upstream
-=======
-
-
-
-
-
->>>>>>> Stashed changes
 public class SnippetResult
 {
     public string Snippet { get; set; }

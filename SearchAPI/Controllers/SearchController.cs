@@ -5,70 +5,66 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Core;
 
-
-<<<<<<< Updated upstream
-[ApiController]
-[Route("api/search")]
-public class SearchController : ControllerBase
-=======
-[Route("api/[controller]")]
-[ApiController]
-public class SearchController : ControllerBase
-{
-    private readonly ISearchLogic _searchLogic;
-
-    public SearchController(ISearchLogic searchLogic)
-    {
-        _searchLogic = searchLogic;
-    }
-
-    [HttpGet("{query}/{maxAmount}")]
-    public ActionResult<SearchResultWithSnippet> Get([FromRoute] string query, [FromRoute] int maxAmount)
-    {
-        var result = _searchLogic.Search(new string[] { query }, maxAmount);
-        return Ok(result);
-    }
-}
-
-
 /*
-//Endpoints issue?
 namespace SearchAPI.Controllers
->>>>>>> Stashed changes
 {
-    private readonly ISearchLogic _searchLogic;
-
-    public SearchController(ISearchLogic searchLogic)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SearchController : ControllerBase
     {
-        _searchLogic = searchLogic;
-    }
-<<<<<<< Updated upstream
+        private readonly ISearchLogic _searchLogic;
 
-    [HttpGet]
-    public IActionResult Get([FromQuery] string[] query, [FromQuery] int maxAmount)
-    {
-        try
+        public SearchController(ISearchLogic searchLogic)
         {
-            var result = _searchLogic.Search(query, maxAmount);
-            return Ok(result);
+            _searchLogic = searchLogic;
         }
-        catch (Exception ex)
+
+        [HttpGet]
+        public IActionResult Get([FromQuery] string[] query, [FromQuery] int maxAmount)
         {
-            Console.WriteLine($"Error: {ex.Message}");
-            return StatusCode(500, "Internal server error");
+            try
+            {
+                var result = _searchLogic.Search(query, maxAmount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
-}
-
-
-
-
-
-
-=======
-
 }
 */
 
->>>>>>> Stashed changes
 
+//Endpoints issue?
+namespace SearchAPI.Controllers
+{
+    [ApiController]
+    [Route("api/search")] // Explicitly set the route to "api/search"
+    public class SearchController : ControllerBase
+    {
+        private readonly ISearchLogic _searchLogic;
+
+        public SearchController(ISearchLogic searchLogic)
+        {
+            _searchLogic = searchLogic;
+        }
+
+        [HttpGet]
+        public IActionResult Get([FromQuery] string[] query, [FromQuery] int maxAmount)
+        {
+            try
+            {
+                var result = _searchLogic.Search(query, maxAmount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+    }
+}
