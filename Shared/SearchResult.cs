@@ -25,7 +25,7 @@ namespace Core
         public TimeSpan TimeUsed { get; set; }
 
         //public string Results { get; set; }
-        
+
 
     }
 }

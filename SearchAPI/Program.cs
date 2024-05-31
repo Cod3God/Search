@@ -118,15 +118,11 @@ namespace SearchAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Register services
-            builder.Services.AddSingleton<ISearchLogic, SearchProxy>();
-
-            // Add controllers
+            builder.Services.AddHttpClient<ISearchLogic, SearchProxy>(); // Use AddHttpClient for dependency injection
             builder.Services.AddControllers();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -138,12 +134,10 @@ namespace SearchAPI
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
             app.MapControllers();
-
             app.Run();
+
         }
     }
 }
