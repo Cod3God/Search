@@ -1,60 +1,40 @@
-﻿@using Core;
+﻿@using Core
 @page "/search"
-<h1>Search</h1>
+@inject ISearchLogic SearchLogic
 
-<InputText @bind-Value="query"></InputText>
-<button @onclick="OnClickSearch">Search</button>
+<h3>Search</h3>
+<InputText @bind-Value="searchQuery" placeholder="Enter search query" />
+<button @onclick="PerformSearch">Search</button>
 
-@if (result != null)
+@if (searchResult != null)
 {
-    <p>Hits:  @result.Hits <br /></p>
-
-    <p>Time used:  @result.TimeUsed.ToString()</p>
-    <table class="table">
-        <tbody>
-            @foreach (var dh in result.DocumentHits)
+    <div>
+        <h4>Results:</h4>
+        @if (searchResult.Result?.DocumentHits != null)
+        {
+            @foreach (var result in searchResult.Result.DocumentHits)
             {
-                <tr>
-                    <td>
-                        <a class="link-info" href="" @onclick="() => OnClickDocUrl(dh.Document.mUrl)" @onclick:preventDefault>
-                            @dh.Document.mUrl</a>
-                        (# hits: @dh.NoOfHits)
-                     </td>
+                <p>@result.Document?.Title - @result.Document?.Snippet</p>
+            }
+        }
+        <h4>Snippets:</h4>
+        @if (searchResult.Snippets != null)
+        {
+            @foreach (var snippet in searchResult.Snippets)
+            {
+                <p>@snippet</p>
+            }
+        }
+    </div>
+}
 
-                </tr>
-                   }
-        </tbody>
-    </table>
-    <ModalDialog @ref="@modalDialog" Title="Indhold">
-        <div class="row">
-            <h3>@fileUrl</h3>
-            <hr>
-            <p>@fileContent</p>
-            <button class="btn btn-primary" @onclick="() => modalDialog.Close()">Close</button>
-        </div>
-    </ModalDialog>}
 @code {
-    private string fileUrl = "";
-    private string fileContent = "";
+    private string searchQuery;
+    private SearchResultWithSnippet searchResult;
 
-    private string query = "";
-
-    private ISearchLogic mLogic = SearchFactory.GetProxy();
-
-    private SearchResult? result;
-
-    private void OnClickSearch()
+    private async Task PerformSearch()
     {
-        result = mLogic.Search(query.Split(" "), 10);
+        searchResult = await SearchLogic.SearchAsync(searchQuery.Split(' '), 10);
     }
-
-    private void OnClickDocUrl(string url) {
-        var s = File.ReadAllText(url);
-        fileUrl = url;
-        fileContent = s;
-        modalDialog.Open();
-    }
-
-    private ModalDialog? modalDialog { get; set; }
 }
 

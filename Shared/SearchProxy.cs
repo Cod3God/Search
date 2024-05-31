@@ -5,6 +5,9 @@ using System.Text.Json;
 using Core;
 using Shared;
 using static System.Net.WebRequestMethods;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 //Start
 // Uden Loadbalancer
@@ -41,52 +44,78 @@ namespace Core
 
 //Port http://localhost:5034/search
 
+
+
+
+
+
+
 public class SearchProxy : ISearchLogic
 {
-    private string DefaultserverEndPoint = "http://localhost:5036/api/search/";
-    private string AlternativeserverEndPoint = "http://localhost:5086/api/search/";
-
-    private HttpClient mHttp;
+    private readonly HttpClient _httpClient;
+    private readonly string DefaultServerEndPoint = "http://localhost:5036/api/search/";
+    private readonly string AlternativeServerEndPoint = "http://localhost:5086/api/search/";
+    private readonly string SnippetServiceEndPoint = "http://localhost:5000/api/snippets/";
     private DateTime lastSearchTime;
     private string lastUsedEndpoint;
 
-    public SearchProxy()
+    public SearchProxy(HttpClient httpClient)
     {
-        mHttp = new HttpClient();
-        lastSearchTime = DateTime.MinValue; // Initialize to a default value
-        lastUsedEndpoint = DefaultserverEndPoint; // Initialize to default endpoint
+        _httpClient = httpClient;
+        lastSearchTime = DateTime.MinValue;
+        lastUsedEndpoint = DefaultServerEndPoint;
     }
 
     public SearchResult Search(string[] query, int maxAmount)
     {
+        // Synchronous method remains unchanged if needed
+        throw new NotImplementedException();
+    }
+
+    public async Task<SearchResultWithSnippet> SearchAsync(string[] query, int maxAmount)
+    {
+        var searchResult = await PerformSearchAsync(query, maxAmount);
+        var snippets = await FetchSnippetsAsync(query);
+
+        return new SearchResultWithSnippet
+        {
+            Result = searchResult,
+            Snippets = snippets
+        };
+    }
+
+    private async Task<SearchResult> PerformSearchAsync(string[] query, int maxAmount)
+    {
         string currentEndpoint = GetCurrentEndpoint();
-
-        Console.WriteLine($"Using API endpoint: {currentEndpoint}"); // Print which API endpoint is being used
-
-        var task = mHttp.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{String.Join(",", query)}/{maxAmount}");
-        var res = task.Result;
-
-        // Update the last search time
+        var res = await _httpClient.GetFromJsonAsync<SearchResult>($"{currentEndpoint}{string.Join(",", query)}/{maxAmount}");
         lastSearchTime = DateTime.UtcNow;
-
         return res;
+    }
+
+    private async Task<List<string>> FetchSnippetsAsync(string[] query)
+    {
+        var snippets = await _httpClient.GetFromJsonAsync<List<SnippetResult>>($"{SnippetServiceEndPoint}{query[0]}");
+        return snippets.Select(s => s.Snippet).ToList();
     }
 
     private string GetCurrentEndpoint()
     {
-        // Check if the time elapsed since the last search is less than 10 seconds
         TimeSpan timeSinceLastSearch = DateTime.UtcNow - lastSearchTime;
-
-        // If less than 10 seconds have passed since the last search, toggle the endpoint
         if (timeSinceLastSearch.TotalSeconds < 10)
         {
-            // Toggle between the two endpoints based on the last used endpoint
-            lastUsedEndpoint = (lastUsedEndpoint == DefaultserverEndPoint) ? AlternativeserverEndPoint : DefaultserverEndPoint;
+            lastUsedEndpoint = (lastUsedEndpoint == DefaultServerEndPoint) ? AlternativeServerEndPoint : DefaultServerEndPoint;
             return lastUsedEndpoint;
         }
 
-        // If more than 10 seconds have passed, use the default endpoint and update last used endpoint
-        lastUsedEndpoint = DefaultserverEndPoint;
+        lastUsedEndpoint = DefaultServerEndPoint;
         return lastUsedEndpoint;
     }
 }
+
+public class SnippetResult
+{
+    public string Snippet { get; set; }
+}
+
+
+

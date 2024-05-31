@@ -1,12 +1,14 @@
 ﻿using System;
 using Shared;
+using System.Net.Http;
+
 namespace Core
 {
-    public class SearchFactory
+    public static class SearchFactory
     {
-        public static ISearchLogic GetProxy() {
-            return new SearchProxy();
+        public static ISearchLogic GetProxy(HttpClient httpClient)
+        {
+            return new SearchProxy(httpClient);
         }
     }
 }
-
