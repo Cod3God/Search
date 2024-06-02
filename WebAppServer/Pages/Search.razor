@@ -18,12 +18,16 @@
             }
         }
         <h4>Snippets:</h4>
-        @if (searchResult.Snippets != null)
+        @if (searchResult.Snippets != null && searchResult.Snippets.Any())
         {
             @foreach (var snippet in searchResult.Snippets)
             {
                 <p>@snippet</p>
             }
+        }
+        else
+        {
+            <p>@searchResult.ErrorMessage</p>
         }
     </div>
 }
@@ -35,6 +39,9 @@
     private async Task PerformSearch()
     {
         searchResult = await SearchLogic.SearchAsync(searchQuery.Split(' '), 10);
+        if (searchResult.Snippets == null || !searchResult.Snippets.Any())
+        {
+            searchResult.ErrorMessage = "Fejl: Intet søgeord";
+        }
     }
 }
-

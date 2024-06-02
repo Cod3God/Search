@@ -1,27 +1,23 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar navbar-dark" style="background-color: black;">
+    <!-- Black background -->
     <div class="container-fluid">
-        <a class="navbar-brand" href="">WebAppServer</a>
+        <a class="navbar-brand text-white" href="">DocSearch</a> <!-- White text -->
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass nav-scrollable collapse navbar-collapse">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link text-white" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="search">
-                <span class="oi oi-search" aria-hidden="true"></span> Search
+            <NavLink class="nav-link text-white" href="search">
+                <span class="oi oi-magnifying-glass" aria-hidden="true"></span> Search
             </NavLink>
         </div>
     </nav>
@@ -38,3 +34,26 @@
     }
 }
 
+<style>
+    .nav-scrollable {
+        overflow-y: auto;
+        max-height: calc(100vh - 56px); /* Adjust based on your header height */
+    }
+
+    .nav-item {
+        margin: 10px 0;
+    }
+
+    .nav-link {
+        color: white;
+        font-size: 18px;
+    }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+</style>

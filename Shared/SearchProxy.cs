@@ -68,20 +68,38 @@ public class SearchProxy : ISearchLogic
 
     public SearchResult Search(string[] query, int maxAmount)
     {
-        // Synchronous method remains unchanged if needed
         throw new NotImplementedException();
     }
 
     public async Task<SearchResultWithSnippet> SearchAsync(string[] query, int maxAmount)
     {
-        var searchResult = await PerformSearchAsync(query, maxAmount);
-        var snippets = await FetchSnippetsAsync(query);
-
-        return new SearchResultWithSnippet
+        try
         {
-            Result = searchResult,
-            Snippets = snippets
-        };
+            var searchResult = await PerformSearchAsync(query, maxAmount);
+            var snippets = await FetchSnippetsAsync(query);
+
+            return new SearchResultWithSnippet
+            {
+                Result = searchResult,
+                Snippets = snippets
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            return new SearchResultWithSnippet
+            {
+                Result = new SearchResult
+                {
+                    Hits = 0,
+                    DocumentHits = new List<DocumentHit>(),
+                    Query = query,
+                    Ignored = new List<string>(),
+                    TimeUsed = TimeSpan.Zero
+                },
+                Snippets = new List<string>(),
+                ErrorMessage = $"Error: {ex.Message}"
+            };
+        }
     }
 
     private async Task<SearchResult> PerformSearchAsync(string[] query, int maxAmount)

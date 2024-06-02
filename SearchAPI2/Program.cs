@@ -1,27 +1,40 @@
-﻿namespace SearchAPI2;
+﻿using Core;
+using SearchAPI.Logic;
 
-public class Program
+namespace SearchAPI2
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+            // Add services to the container.
+            builder.Services.AddControllers();
 
-        builder.Services.AddControllers();
+            // Register ISearchLogic
+            builder.Services.AddScoped<ISearchLogic, SearchLogic>();
+                     builder.Services.AddHttpClient<ISearchLogic, SearchProxy>();
+            builder.Services.AddSingleton<IDatabase, Database>(); // Ensure IDatabase is registered
+            builder.Services.AddSingleton<ISearchLogic, SearchLogic>(); // Register SearchLogic
 
-        var app = builder.Build();
+            var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
 
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-
-        app.MapControllers();
-
-        app.Run();
+            app.UseHttpsRedirection();
+            app.UseAuthorization();
+            app.MapControllers();
+            app.Run();
+        }
     }
 }
-
