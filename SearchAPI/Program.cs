@@ -12,8 +12,8 @@ namespace SearchAPI
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddHttpClient<ISearchLogic, SearchProxy>();
-            builder.Services.AddSingleton<IDatabase, Database>(); // Ensure IDatabase is registered
-            builder.Services.AddSingleton<ISearchLogic, SearchLogic>(); // Register SearchLogic
+            builder.Services.AddSingleton<IDatabase, Database>(); // Sørger for at IDatabase er registreret 
+            builder.Services.AddSingleton<ISearchLogic, SearchLogic>(); // Registrer SearchLogic
             builder.Services.AddControllers();
 
             var app = builder.Build();
@@ -24,39 +24,3 @@ namespace SearchAPI
         }
     }
 }
-
-
-
-/*
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddHttpClient<ISearchLogic, SearchProxy>();
-builder.Services.AddSingleton<IDatabase, Database>(); // Ensure IDatabase is registered
-builder.Services.AddSingleton<ISearchLogic, SearchLogic>(); // Register SearchLogic
-builder.Services.AddControllers();
-
-var app = builder.Build();
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
-*/
-
-
-/*
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddHttpClient<ISearchLogic, SearchProxy>();
-        builder.Services.AddControllers();
-
-        var app = builder.Build();
-        app.UseHttpsRedirection();
-        app.UseAuthorization();
-        app.MapControllers();
-        app.Run();
-
-    }
-}
-*/

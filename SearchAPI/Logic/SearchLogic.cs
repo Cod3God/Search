@@ -6,8 +6,10 @@ using Core;
 
 namespace SearchAPI.Logic
 {
+    //Implementering af ISearchLogic
     public class SearchLogic : ISearchLogic
     {
+        //Bruger DB til søgninger
         private readonly IDatabase mDatabase;
 
         public SearchLogic(IDatabase database)
@@ -15,6 +17,7 @@ namespace SearchAPI.Logic
             mDatabase = database;
         }
 
+        //
         public SearchResult Search(string[] query, int maxAmount)
         {
             List<string> ignored;

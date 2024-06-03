@@ -9,53 +9,20 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 
-//Start
-// Uden Loadbalancer
-/*
-namespace Core
-{
-    public class SearchProxy : ISearchLogic
-    {
-        private string DefaultserverEndPoint = "http://localhost:5036/api/search/";
-        private string AlternativeserverEndPoint = "http://localhost:5086/api/search/";
-
-        //Core.csproj --> Target framework, ændre til dotnet 7
-
-        private HttpClient mHttp;
-
-        public SearchProxy()
-        {
-            mHttp = new System.Net.Http.HttpClient();
-        }
-
-        public SearchResult Search(string[] query, int maxAmount)
-        {
-            var task = mHttp.GetFromJsonAsync<SearchResult>($"{serverEndPoint}{String.Join(",", query)}/{maxAmount}");
-            //var resultStr = response.Content.ReadAsStringAsync().Result;
-            var res = task.Result;
-            //result = JsonSerializer.Deserialize<SearchResult>(resultStr);
-            return res;
-        }
-    }
-}
-*/
-
-// Med Loadbalancer
 
 //Port http://localhost:5034/search
 
 
+// Loggeroplysninger bliver genereret af HttpClient-objektet
 
 
-
-
-
+//URL til de forskellige servere
 public class SearchProxy : ISearchLogic
 {
     private readonly HttpClient _httpClient;
     private readonly string DefaultServerEndPoint = "http://localhost:5036/api/search/";
     private readonly string AlternativeServerEndPoint = "http://localhost:5086/api/search/";
-    private readonly string SnippetServiceEndPoint = "http://localhost:5000/api/snippets/";
+    private readonly string SnippetServiceEndPoint = "http://localhost:5000/api/snippets/";  //Henter fra snippetservice API
     private DateTime lastSearchTime;
     private string lastUsedEndpoint;
 
@@ -71,6 +38,8 @@ public class SearchProxy : ISearchLogic
         throw new NotImplementedException();
     }
 
+    //Modtager array af søgetermer + max
+    // kalder de andre metoder for at lave den faktiske søgning og hente
     public async Task<SearchResultWithSnippet> SearchAsync(string[] query, int maxAmount)
     {
         try
@@ -102,6 +71,7 @@ public class SearchProxy : ISearchLogic
         }
     }
 
+    //Modtager søgetermer og bestemmer hvilket endpoint ud fra getcurrentendpoint metode
     private async Task<SearchResult> PerformSearchAsync(string[] query, int maxAmount)
     {
         string currentEndpoint = GetCurrentEndpoint();
@@ -110,12 +80,14 @@ public class SearchProxy : ISearchLogic
         return res;
     }
 
+    //Modtager søgetermerne, henter uddrag fra snippet endpoint
     private async Task<List<string>> FetchSnippetsAsync(string[] query)
     {
         var snippets = await _httpClient.GetFromJsonAsync<List<SnippetResult>>($"{SnippetServiceEndPoint}{query[0]}");
         return snippets.Select(s => s.Snippet).ToList();
     }
 
+    //Bestemmer endpoint ud fra et regelsæt
     private string GetCurrentEndpoint()
     {
         TimeSpan timeSinceLastSearch = DateTime.UtcNow - lastSearchTime;
@@ -130,6 +102,7 @@ public class SearchProxy : ISearchLogic
     }
 }
 
+//Initiering af snippet / Data format
 public class SnippetResult
 {
     public string Snippet { get; set; }
