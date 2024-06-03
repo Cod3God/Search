@@ -1,6 +1,8 @@
 ﻿@using Core
-@page "/search"
+<!-- Adgang til IsearchLogic-->
+@page "/search"  
 @inject ISearchLogic SearchLogic
+<!-- Til udførelse af søgninger-->
 
 <h3>Search</h3>
 <InputText @bind-Value="searchQuery" placeholder="Enter search query" />
@@ -31,7 +33,7 @@
         }
     </div>
 }
-
+<!-- Logikken til at udføre søgningen-->
 @code {
     private string searchQuery;
     private SearchResultWithSnippet searchResult;
